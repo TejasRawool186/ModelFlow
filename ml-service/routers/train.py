@@ -21,6 +21,7 @@ class TrainRequest(BaseModel):
     algorithm: str = "logistic_regression"
     test_split: float = 0.2
     embedding_model: str = "all-MiniLM-L6-v2"
+    hyperparams: Optional[dict] = None
 
 
 class EmbedRequest(BaseModel):
@@ -64,6 +65,7 @@ def train_endpoint(req: TrainRequest):
             labels=req.labels,
             algorithm=req.algorithm,
             test_split=req.test_split,
+            hyperparams=req.hyperparams,
         )
 
         return {

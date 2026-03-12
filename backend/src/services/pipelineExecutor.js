@@ -50,6 +50,9 @@ async function executeNode(node, inputs, context) {
   const config = node.data?.config || {};
 
   switch (node.type) {
+    case "data_preview":
+      return await executeDataPreviewNode(config, inputs);
+
     case "dataset":
       return await executeDatasetNode(config, inputs);
 
@@ -144,6 +147,25 @@ async function executeDatasetNode(config) {
     rowCount: rows.length,
     textColumn: config.textColumn || null,
     labelColumn: config.labelColumn || null,
+  };
+}
+
+/**
+ * Data Preview node — passes data through but specifically truncates it for preview
+ */
+async function executeDataPreviewNode(config, inputs) {
+  const data = inputs;
+  if (!data || !data.rows) {
+    throw new Error("No data received. Connect a Dataset or Preprocessing node first.");
+  }
+  const numRows = config.numRows || 5;
+  return {
+    ...data,
+    previewRows: data.rows.slice(0, numRows),
+    previewHeaders: data.headers || Object.keys(data.rows[0] || {}),
+    totalRowCount: data.rows.length,
+    numPreviewRows: numRows,
+    isDataPreview: true,
   };
 }
 
@@ -339,6 +361,7 @@ async function executeTrainingNode(config, inputs) {
       algorithm,
       test_split: testSplit,
       embedding_model: config.embeddingModel || inputs.embeddingModel || "all-MiniLM-L6-v2",
+      hyperparams: { ...config }
     };
 
     // Send pre-computed embeddings if available, otherwise send raw texts
@@ -349,6 +372,8 @@ async function executeTrainingNode(config, inputs) {
       payload.texts = texts;
       payload.labels = labels;
     }
+
+    require('fs').writeFileSync('D:/ModelFlow/last_train_payload.json', JSON.stringify(payload, null, 2));
 
     console.log(`[Executor] Training ${algorithm} model with ${texts.length || embeddings?.length} samples...`);
 
