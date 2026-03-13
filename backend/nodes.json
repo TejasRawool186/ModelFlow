@@ -1,0 +1,167 @@
+[
+  {
+    "id": "node_1",
+    "type": "dataset",
+    "position": {
+      "x": -112,
+      "y": -496
+    },
+    "data": {
+      "config": {
+        "datasetId": "8edf8c69-a653-4abf-8fad-9db8cdec1cb9",
+        "format": "csv",
+        "textColumn": "",
+        "labelColumn": "Department",
+        "textColumns": [
+          "Subject",
+          "Description"
+        ]
+      },
+      "summary": "Format: csv · Text: Subject, Description · Label: Department",
+      "status": null
+    },
+    "measured": {
+      "width": 220,
+      "height": 102
+    },
+    "dragging": false,
+    "selected": false
+  },
+  {
+    "id": "node_2",
+    "type": "preprocessing",
+    "position": {
+      "x": -112,
+      "y": -320
+    },
+    "data": {
+      "config": {
+        "textColumn": "",
+        "labelColumn": "",
+        "lowercase": true,
+        "stripHtml": true,
+        "removePunctuation": true,
+        "removeNumbers": true,
+        "removeUrls": true
+      },
+      "summary": "Configure columns...",
+      "status": null
+    },
+    "measured": {
+      "width": 220,
+      "height": 84
+    },
+    "dragging": false,
+    "selected": true
+  },
+  {
+    "id": "node_3",
+    "type": "language",
+    "position": {
+      "x": -96,
+      "y": -128
+    },
+    "data": {
+      "config": {
+        "languages": [
+          "hi",
+          "es",
+          "fr"
+        ],
+        "sourceLanguage": "en"
+      },
+      "summary": null,
+      "status": null
+    },
+    "measured": {
+      "width": 220,
+      "height": 98
+    },
+    "dragging": false,
+    "selected": false
+  },
+  {
+    "id": "node_4",
+    "type": "embedding",
+    "position": {
+      "x": -96,
+      "y": 64
+    },
+    "data": {
+      "config": {
+        "model": "paraphrase-multilingual-MiniLM-L12-v2"
+      },
+      "summary": null,
+      "status": null
+    },
+    "measured": {
+      "width": 220,
+      "height": 98
+    },
+    "dragging": false,
+    "selected": false
+  },
+  {
+    "id": "node_5",
+    "type": "validation",
+    "position": {
+      "x": 544,
+      "y": -240
+    },
+    "data": {
+      "config": {
+        "minRows": 10,
+        "minClasses": 2
+      },
+      "summary": null,
+      "status": null
+    },
+    "measured": {
+      "width": 220,
+      "height": 98
+    },
+    "dragging": false,
+    "selected": false
+  },
+  {
+    "id": "node_6",
+    "type": "evaluation",
+    "position": {
+      "x": 560,
+      "y": 240
+    },
+    "data": {
+      "config": {},
+      "summary": null,
+      "status": null
+    },
+    "measured": {
+      "width": 220,
+      "height": 98
+    },
+    "dragging": false,
+    "selected": false
+  },
+  {
+    "id": "node_8",
+    "type": "training",
+    "position": {
+      "x": 512,
+      "y": -32
+    },
+    "data": {
+      "config": {
+        "algorithm": "logistic_regression",
+        "testSplit": 0.2
+      },
+      "summary": null,
+      "status": null
+    },
+    "measured": {
+      "width": 220,
+      "height": 98
+    },
+    "dragging": false,
+    "selected": false
+  }
+]

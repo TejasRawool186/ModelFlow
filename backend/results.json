@@ -1,0 +1,149 @@
+[
+  {
+    "nodeId": "node_1",
+    "type": "dataset",
+    "status": "completed",
+    "output": {
+      "datasetId": "8edf8c69-a653-4abf-8fad-9db8cdec1cb9",
+      "datasetName": "customer_support_tickets.csv",
+      "format": "csv",
+      "headers": [
+        "Ticket_ID",
+        "Subject",
+        "Description",
+        "Department"
+      ],
+      "rows": [
+        {
+          "Ticket_ID": "T-1001",
+          "Subject": "Cannot log into my account",
+          "Description": "I've tried resetting my password three times but I am still not getting the email link. Please help.",
+          "Department": "Tech Support"
+        },
+        {
+          "Ticket_ID": "T-1002",
+          "Subject": "Where is my refund?",
+          "Description": "You promised a refund 5 days ago and it is still not in my bank. This is unacceptable.",
+          "Department": "Billing"
+        },
+        {
+          "Ticket_ID": "T-1003",
+          "Subject": "Do you offer enterprise pricing for 500+ users?",
+          "Description": "We are a large agency and want to know if you offer volume discounts.",
+          "Department": "Sales"
+        },
+        {
+          "Ticket_ID": "T-1004",
+          "Subject": "App crashes on startup",
+          "Description": "Ever since the new update on iOS 17 the app crashes immediately when I open it.",
+          "Department": "Tech Support"
+        },
+        {
+          "Ticket_ID": "T-1005",
+          "Subject": "Double charged on my credit card",
+          "Description": "I just checked my statement and I was charged twice for the monthly subscription.",
+          "Department": "Billing"
+        },
+        {
+          "Ticket_ID": "T-1006",
+          "Subject": "Can we get a demo?",
+          "Description": "Our team is interested in your product but we would like a live demonstration first.",
+          "Department": "Sales"
+        },
+        {
+          "Ticket_ID": "T-1007",
+          "Subject": "API rate limit error 429",
+          "Description": "My integration keeps hitting a 429 Too Many Requests error even though I haven't exceeded my quota.",
+          "Department": "Tech Support"
+        },
+        {
+          "Ticket_ID": "T-1008",
+          "Subject": "Invoice for tax purposes",
+          "Description": "I need a formal invoice for last month's payment to submit to my accounting department.",
+          "Department": "Billing"
+        },
+        {
+          "Ticket_ID": "T-1009",
+          "Subject": "Custom SLA agreement",
+          "Description": "Do you provide custom Service Level Agreements for your enterprise tier?",
+          "Department": "Sales"
+        },
+        {
+          "Ticket_ID": "T-1010",
+          "Subject": "Data sync is failing",
+          "Description": "The changes I make on the desktop app don't show up on my mobile device.",
+          "Department": "Tech Support"
+        },
+        {
+          "Ticket_ID": "T-1011",
+          "Subject": "Cancel my subscription",
+          "Description": "I'm not using the service enough to justify the cost. Please cancel my account.",
+          "Department": "Billing"
+        },
+        {
+          "Ticket_ID": "T-1012",
+          "Subject": "Partnership opportunity",
+          "Description": "We would like to discuss a potential integration partnership with your platform.",
+          "Department": "Sales"
+        },
+        {
+          "Ticket_ID": "T-1013",
+          "Subject": "Feature request: Dark mode",
+          "Description": "It hurts my eyes to use the app at night. Please add a dark theme.",
+          "Department": "Tech Support"
+        },
+        {
+          "Ticket_ID": "T-1014",
+          "Subject": "My card was declined",
+          "Description": "I'm trying to upgrade my plan but my payment keeps failing even though I have funds.",
+          "Department": "Billing"
+        },
+        {
+          "Ticket_ID": "T-1015",
+          "Subject": "Do you sell white-label solutions?",
+          "Description": "We want to resell your software under our own brand.",
+          "Department": "Sales"
+        },
+        {
+          "Ticket_ID": "T-1016",
+          "Subject": "Browser extension not working",
+          "Description": "The Chrome extension doesn't load when I click it on certain websites.",
+          "Department": "Tech Support"
+        },
+        {
+          "Ticket_ID": "T-1017",
+          "Subject": "Prorated refund for annual plan",
+          "Description": "If I cancel 3 months into an annual plan do I get the rest of my money back?",
+          "Department": "Billing"
+        },
+        {
+          "Ticket_ID": "T-1018",
+          "Subject": "Competitor comparison",
+          "Description": "How does your tool compare to [Competitor Name]? We are deciding between both.",
+          "Department": "Sales"
+        },
+        {
+          "Ticket_ID": "T-1019",
+          "Subject": "Lost two days of work",
+          "Description": "The auto-save feature failed and everything I did yesterday is gone. Is there a backup?",
+          "Department": "Tech Support"
+        },
+        {
+          "Ticket_ID": "T-1020",
+          "Subject": "Disputing a charge",
+          "Description": "I didn't authorize this recent purchase. I will issue a chargeback if this isn't resolved.",
+          "Department": "Billing"
+        }
+      ],
+      "rowCount": 20,
+      "textColumn": null,
+      "labelColumn": "Department"
+    }
+  },
+  {
+    "nodeId": "node_2",
+    "type": "preprocessing",
+    "status": "error",
+    "error": "No text column specified. Configure the Preprocessing node or Dataset node."
+  }
+]

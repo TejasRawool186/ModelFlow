@@ -138,6 +138,14 @@ async function executeDatasetNode(config) {
 
   console.log(`[Executor] Dataset loaded: ${ds.name}, ${rows.length} rows, columns: [${headers.join(", ")}]`);
 
+  // Handle textColumns backward compatibility safely
+  let textColumns = [];
+  if (Array.isArray(config.textColumns) && config.textColumns.length > 0) {
+    textColumns = config.textColumns;
+  } else if (config.textColumn) {
+    textColumns = [config.textColumn];
+  }
+
   return {
     datasetId,
     datasetName: ds.name,
@@ -145,7 +153,7 @@ async function executeDatasetNode(config) {
     headers,
     rows,
     rowCount: rows.length,
-    textColumn: config.textColumn || null,
+    textColumns,
     labelColumn: config.labelColumn || null,
   };
 }
@@ -173,33 +181,57 @@ async function executeDataPreviewNode(config, inputs) {
  * Preprocessing node — select columns, clean text, filter empty rows
  */
 async function executePreprocessingNode(config, inputs) {
-  const textColumn = config.textColumn || inputs.textColumn;
+  // Use config's textColumns if provided AND NOT EMPTY, otherwise inherit from inputs
+  let textColumns = [];
+  
+  if (Array.isArray(config.textColumns) && config.textColumns.length > 0) {
+    textColumns = config.textColumns;
+  } else if (Array.isArray(inputs.textColumns) && inputs.textColumns.length > 0) {
+    textColumns = inputs.textColumns;
+  }
+
+  // Fallback for older pipelines that might still use textColumn (single string)
+  if (textColumns.length === 0) {
+    if (config.textColumn) textColumns = [config.textColumn];
+    else if (inputs.textColumn) textColumns = [inputs.textColumn];
+  }
+
   const labelColumn = config.labelColumn || inputs.labelColumn;
   let rows = inputs.rows || [];
   const headers = inputs.headers || [];
 
-  if (!textColumn) {
-    throw new Error("No text column specified. Configure the Preprocessing node or Dataset node.");
+  if (textColumns.length === 0) {
+    throw new Error("No text columns specified. Configure the Preprocessing node or Dataset node.");
   }
   if (!labelColumn) {
     throw new Error("No label column specified. Configure the Preprocessing node or Dataset node.");
   }
-  if (!headers.includes(textColumn)) {
-    throw new Error(`Text column "${textColumn}" not found in dataset. Available columns: ${headers.join(", ")}`);
+  for (const col of textColumns) {
+    if (!headers.includes(col)) {
+      throw new Error(`Text column "${col}" not found in dataset. Available columns: ${headers.join(", ")}`);
+    }
   }
   if (!headers.includes(labelColumn)) {
     throw new Error(`Label column "${labelColumn}" not found in dataset. Available columns: ${headers.join(", ")}`);
   }
 
-  // Filter rows with empty text or label
+  // Filter rows where ALL specified text columns are empty AND the label is empty
   const beforeCount = rows.length;
-  rows = rows.filter((r) => r[textColumn]?.trim() && r[labelColumn]?.trim());
+  rows = rows.filter((r) => {
+    const hasAnyText = textColumns.some((col) => r[col]?.trim());
+    const hasLabel = r[labelColumn]?.trim();
+    return hasAnyText && hasLabel;
+  });
 
-  // Apply text cleaning
+  // Apply text cleaning and concatenation
   const texts = rows.map((r) => {
-    let text = r[textColumn];
+    // Concatenate all text columns with a space
+    let text = textColumns.map(col => r[col]?.trim() || "").filter(Boolean).join(" ");
+    
     if (config.lowercase) text = text.toLowerCase();
     if (config.stripHtml) text = text.replace(/<[^>]*>/g, "");
+    if (config.removeUrls) text = text.replace(/https?:\/\/[^\s]+/g, "");
+    if (config.removeNumbers) text = text.replace(/\d+/g, "");
     if (config.removePunctuation) text = text.replace(/[^\w\s]/g, "");
     return text.trim();
   });
@@ -213,7 +245,7 @@ async function executePreprocessingNode(config, inputs) {
   return {
     texts,
     labels,
-    textColumn,
+    textColumns,
     labelColumn,
     rowCount: texts.length,
     removedRows: beforeCount - texts.length,
@@ -287,14 +319,16 @@ async function executeValidationNode(config, inputs) {
     // Pass through data
     texts,
     labels,
-    textColumn: inputs.textColumn,
+    textColumns: inputs.textColumns,
     labelColumn: inputs.labelColumn,
     uniqueLabels: inputs.uniqueLabels,
   };
 }
 
 async function executeLangNode(config, inputs) {
-  const texts = inputs.texts || inputs.rows?.map((r) => r[inputs.textColumn]) || [];
+  // Try to use pre-processed texts first. If not available, attempt to build from rows using first text column as fallback
+  const firstTextCol = inputs.textColumns && inputs.textColumns.length > 0 ? inputs.textColumns[0] : inputs.textColumn;
+  const texts = inputs.texts || inputs.rows?.map((r) => r[firstTextCol]) || [];
   const labels = inputs.labels || inputs.rows?.map((r) => r[inputs.labelColumn]) || [];
   
   if (texts.length === 0) {
@@ -325,7 +359,7 @@ async function executeLangNode(config, inputs) {
     data: { originalTexts: texts, translations: result },
     texts: expandedTexts,
     labels: expandedLabels,
-    textColumn: inputs.textColumn,
+    textColumns: inputs.textColumns,
     labelColumn: inputs.labelColumn,
     translations: result
   };
@@ -342,7 +376,7 @@ async function executeEmbeddingNode(config, inputs) {
     const res = await axios.post(`${ML_SERVICE_URL}/embed`, {
       texts,
       model: config.model || "all-MiniLM-L6-v2",
-    }, { timeout: 120000 });
+    }, { timeout: 600000 }); // 10 min — multilingual models are larger and first load takes time
     console.log(`[Executor] Embedded ${texts.length} texts using ${config.model || "all-MiniLM-L6-v2"}`);
     return {
       embeddings: res.data.embeddings,
@@ -351,7 +385,7 @@ async function executeEmbeddingNode(config, inputs) {
       // Pass through
       texts,
       labels: inputs.labels,
-      textColumn: inputs.textColumn,
+      textColumns: inputs.textColumns,
       labelColumn: inputs.labelColumn,
       uniqueLabels: inputs.uniqueLabels,
     };
@@ -407,18 +441,21 @@ async function executeTrainingNode(config, inputs) {
     // Save model to backend DB so Playground can find it
     if (result.model_id) {
       const modelName = `${algorithm.replace(/_/g, " ")} — ${new Date().toLocaleDateString()}`;
+      const isMultilingual = payload.embedding_model === "paraphrase-multilingual-MiniLM-L12-v2" ? 1 : 0;
+      
       try {
         db.prepare(
-          `INSERT OR REPLACE INTO models (id, name, algorithm, dataset_id, metrics, status) VALUES (?, ?, ?, ?, ?, ?)`
+          `INSERT OR REPLACE INTO models (id, name, algorithm, dataset_id, metrics, status, multilingual) VALUES (?, ?, ?, ?, ?, ?, ?)`
         ).run(
           result.model_id,
           modelName,
           algorithm,
           inputs.datasetId || "",
           JSON.stringify(result.metrics || {}),
-          "completed"
+          "completed",
+          isMultilingual
         );
-        console.log(`[Executor] Model saved to DB: ${result.model_id} (${modelName})`);
+        console.log(`[Executor] Model saved to DB: ${result.model_id} (${modelName}, multilingual=${isMultilingual})`);
       } catch (dbErr) {
         console.error("[Executor] Failed to save model to DB:", dbErr.message);
       }

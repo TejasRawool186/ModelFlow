@@ -1,0 +1,21 @@
+Ticket_ID,Subject,Description,Department
+T-1001,Cannot log into my account,I've tried resetting my password three times but I am still not getting the email link. Please help.,Tech Support
+T-1002,Where is my refund?,You promised a refund 5 days ago and it is still not in my bank. This is unacceptable.,Billing
+T-1003,Do you offer enterprise pricing for 500+ users?,We are a large agency and want to know if you offer volume discounts.,Sales
+T-1004,App crashes on startup,Ever since the new update on iOS 17 the app crashes immediately when I open it.,Tech Support
+T-1005,Double charged on my credit card,I just checked my statement and I was charged twice for the monthly subscription.,Billing
+T-1006,Can we get a demo?,Our team is interested in your product but we would like a live demonstration first.,Sales
+T-1007,API rate limit error 429,My integration keeps hitting a 429 Too Many Requests error even though I haven't exceeded my quota.,Tech Support
+T-1008,Invoice for tax purposes,I need a formal invoice for last month's payment to submit to my accounting department.,Billing
+T-1009,Custom SLA agreement,Do you provide custom Service Level Agreements for your enterprise tier?,Sales
+T-1010,Data sync is failing,The changes I make on the desktop app don't show up on my mobile device.,Tech Support
+T-1011,Cancel my subscription,I'm not using the service enough to justify the cost. Please cancel my account.,Billing
+T-1012,Partnership opportunity,We would like to discuss a potential integration partnership with your platform.,Sales
+T-1013,Feature request: Dark mode,It hurts my eyes to use the app at night. Please add a dark theme.,Tech Support
+T-1014,My card was declined,I'm trying to upgrade my plan but my payment keeps failing even though I have funds.,Billing
+T-1015,Do you sell white-label solutions?,We want to resell your software under our own brand.,Sales
+T-1016,Browser extension not working,The Chrome extension doesn't load when I click it on certain websites.,Tech Support
+T-1017,Prorated refund for annual plan,If I cancel 3 months into an annual plan do I get the rest of my money back?,Billing
+T-1018,Competitor comparison,How does your tool compare to [Competitor Name]? We are deciding between both.,Sales
+T-1019,Lost two days of work,The auto-save feature failed and everything I did yesterday is gone. Is there a backup?,Tech Support
+T-1020,Disputing a charge,I didn't authorize this recent purchase. I will issue a chargeback if this isn't resolved.,Billing

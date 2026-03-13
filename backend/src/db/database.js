@@ -44,6 +44,7 @@ db.exec(`
     metrics TEXT DEFAULT '{}',
     filepath TEXT,
     status TEXT DEFAULT 'training',
+    multilingual BOOLEAN DEFAULT 0,
     created_at TEXT DEFAULT (datetime('now'))
   );
 
@@ -57,5 +58,12 @@ db.exec(`
     completed_at TEXT
   );
 `);
+
+// Migration for existing databases
+try {
+  db.exec(`ALTER TABLE models ADD COLUMN multilingual BOOLEAN DEFAULT 0;`);
+} catch (err) {
+  // Ignore error if column already exists
+}
 
 module.exports = db;

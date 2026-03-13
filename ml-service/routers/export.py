@@ -47,3 +47,11 @@ def export_endpoint(req: ExportRequest):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/export/download")
+def download_export(path: str):
+    """Download the generated export zip file."""
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(path, media_type="application/zip", filename=os.path.basename(path))

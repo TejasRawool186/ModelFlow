@@ -77,13 +77,47 @@ router.post("/train", async (req, res) => {
   }
 });
 
-// POST /api/ml/predict — Proxy to ML service
+const lingodevService = require("../services/lingodevService");
+
+// POST /api/ml/predict — Proxy to ML service with translation support
 router.post("/predict", async (req, res) => {
   try {
-    const response = await axios.post(`${ML_SERVICE_URL}/predict`, req.body, {
+    const { model_id, text, sourceLanguage } = req.body;
+    let textToPredict = text;
+    let translationMessage = null;
+
+    // 1. Fetch the model to determine its capability
+    const model = db.prepare("SELECT multilingual FROM models WHERE id = ?").get(model_id);
+    const isMultilingual = model && model.multilingual === 1;
+
+    // 2. If testing in a non-English language on an English-only model, translate first!
+    if (sourceLanguage && sourceLanguage !== "en" && !isMultilingual) {
+      console.log(`[ML Route] Translating testing input from ${sourceLanguage} to en for English-only model...`);
+      const transResults = await lingodevService.expandDataset([text], sourceLanguage, ["en"]);
+      
+      if (transResults[0] && transResults[0].translations && !transResults[0].error) {
+        textToPredict = transResults[0].translations[0];
+        translationMessage = `Translated from ${sourceLanguage.toUpperCase()}: "${textToPredict}"`;
+      } else {
+        console.warn("[ML Route] Translation failed for prediction fallback.");
+      }
+    }
+
+    // 3. Send to actual ML service
+    const response = await axios.post(`${ML_SERVICE_URL}/predict`, { 
+      ...req.body, 
+      text: textToPredict 
+    }, {
       timeout: 10000,
     });
-    res.json(response.data);
+    
+    // Add translation message to response if applicable
+    const responseData = response.data;
+    if (translationMessage) {
+      responseData.translation_note = translationMessage;
+    }
+    
+    res.json(responseData);
   } catch (err) {
     if (err.code === "ECONNREFUSED") {
       const labels = [
@@ -128,6 +162,42 @@ router.post("/export", async (req, res) => {
   }
 });
 
+// GET /api/ml/export/download — Proxy download to ML service
+router.get("/export/download", async (req, res) => {
+  try {
+    const filePath = req.query.path;
+    if (!filePath) {
+      return res.status(400).json({ message: "Missing path parameter" });
+    }
+    
+    const response = await axios({
+      method: "GET",
+      url: `${ML_SERVICE_URL}/export/download`,
+      params: { path: filePath },
+      responseType: "stream",
+      timeout: 30000,
+    });
+    
+    // Forward headers
+    if (response.headers["content-type"]) {
+      res.setHeader("Content-Type", response.headers["content-type"]);
+    }
+    if (response.headers["content-disposition"]) {
+      res.setHeader("Content-Disposition", response.headers["content-disposition"]);
+    }
+    
+    response.data.pipe(res);
+  } catch (err) {
+    if (err.code === "ECONNREFUSED") {
+      res.status(503).json({ message: "Demo mode — ML service not connected" });
+    } else {
+      res
+        .status(err.response?.status || 500)
+        .json({ message: err.message || "Failed to download export" });
+    }
+  }
+});
+
 // GET /api/ml/models — List trained models
 router.get("/models", (req, res) => {
   const models = db
@@ -140,6 +210,7 @@ router.get("/models", (req, res) => {
       algorithm: m.algorithm,
       metrics: JSON.parse(m.metrics || "{}"),
       status: m.status,
+      multilingual: m.multilingual === 1,
       createdAt: m.created_at,
     }))
   );
