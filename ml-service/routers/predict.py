@@ -34,17 +34,29 @@ def predict_endpoint(req: PredictRequest):
         prediction_idx = model.predict(embedding)[0]
         prediction_label = le.inverse_transform([prediction_idx])[0]
 
-        # Get confidence
+        # Get confidence and top probabilities
         confidence = 0.0
+        probabilities = []
         if hasattr(model, "predict_proba"):
             proba = model.predict_proba(embedding)[0]
             confidence = float(max(proba))
+            
+            # Get top 3 indices sorted by probability descending
+            # Using argsort and taking the last 3, then reversing
+            top_3_idx = np.argsort(proba)[-3:][::-1]
+            for idx in top_3_idx:
+                prob = float(proba[idx])
+                if prob > 0:
+                    label = le.inverse_transform([idx])[0]
+                    probabilities.append({"label": str(label), "confidence": round(prob, 4)})
         elif hasattr(model, "decision_function"):
             confidence = float(min(abs(model.decision_function(embedding)[0]), 1.0))
+            probabilities = [{"label": str(prediction_label), "confidence": round(confidence, 4)}]
 
         return {
-            "prediction": prediction_label,
+            "prediction": str(prediction_label),
             "confidence": round(confidence, 4),
+            "probabilities": probabilities,
             "model_id": req.model_id,
             "text": req.text,
         }
