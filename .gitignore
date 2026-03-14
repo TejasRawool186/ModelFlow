@@ -41,3 +41,9 @@ coverage/
 
 # Uploads
 backend/uploads/
+
+# ML Models
+ml-service/models/
+.vscode/
+pyrightconfig.json
+.pyre_configuration
