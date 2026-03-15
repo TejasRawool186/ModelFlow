@@ -9,7 +9,7 @@ ModelFlow is a no-code visual pipeline builder that allows teams to ingest data,
 [Features](#features) • [How it Works](#how-it-works) • [Tech Stack](#tech-stack) • [Getting Started](#getting-started) • [Documentation](#documentation)
 
 <br/>
-![ModelFlow Hero Banner](./frontend/public/README-assets/hero.png)
+<img src="frontend/public/README-assets/hero.png" alt="ModelFlow Hero Banner" width="100%" />
 
 </div>
 
@@ -30,10 +30,9 @@ ModelFlow solves this by integrating visual model building with immediate, autom
 - **One-Click Export**: Download your completely trained, production-ready model as an executable zip package.
 - **Data Preprocessing**: Integrated nodes for handling missing values, label encoding, and data normalization.
 
-<br/>
-<div align="center">
-![ModelFlow Pipeline Nodes](./frontend/public/README-assets/nodes.png)
-</div>
+<p align="center">
+  <img src="frontend/public/README-assets/nodes.png" alt="ModelFlow Pipeline Nodes" width="100%" />
+</p>
 <br/>
 
 ## How It Works
