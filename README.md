@@ -15,6 +15,12 @@ ModelFlow is a no-code visual pipeline builder that allows teams to ingest data,
 
 ---
 
+## Demo
+
+Watch the project demo on YouTube:
+
+[ModelFlow Demo Video](https://youtu.be/oy5obVnUl4M)
+
 ## The Vision
 
 Most machine learning models suffer from severe language bias due to the dominance of English training data. Building localized datasets for every language is slow, expensive, and scales poorly.
